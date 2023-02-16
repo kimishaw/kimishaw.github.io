@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-EventLoop" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/02/16/EventLoop/" class="article-date">
+  <time class="dt-published" datetime="2023-02-16T08:41:59.000Z" itemprop="datePublished">2023-02-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/02/16/EventLoop/">EventLoop</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <!-- # EventLoop -->
+
+<img src="/2023/02/16/EventLoop/Untitled.png" class="" title="这是一张图片">
+
+<p><img src="/Untitled.png"></p>
+<!--  -->
+
+
+<h1 id="为什么JavaScript是单线程"><a href="#为什么JavaScript是单线程" class="headerlink" title="为什么JavaScript是单线程?"></a>为什么JavaScript是单线程?</h1><p>JavaScript的单线程，与它的用途有关。作为浏览器脚本语言，JavaScript的主要用途是与用户互动，以及操作DOM。这决定了它只能是单线程，否则会带来很复杂的同步问题。比如，假定JavaScript同时有两个线程，一个线程在某个DOM节点上添加内容，另一个线程删除了这个节点，这时浏览器应该以哪个线程为准？</p>
+<p>为了利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。</p>
+<p>结论：<strong>JavaScript主线程是单线程的</strong>。</p>
+<h1 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h1><p>单线程就意味着，所有任务需要排队，前一个任务结束，才会执行后一个任务。如果前一个任务耗时很长，后一个任务就不得不一直等着。</p>
+<p>JavaScript语言的设计者意识到，这时主线程完全可以不管IO设备，挂起处于等待中的任务，先运行排在后面的任务。等到IO设备返回了结果，再回过头，把挂起的任务继续执行下去。</p>
+<h2 id="任务类型"><a href="#任务类型" class="headerlink" title="任务类型"></a>任务类型</h2><p>任务可以分成两种，一种是<strong>同步任务（synchronous）</strong>，另一种是<strong>异步任务（asynchronous）</strong>。</p>
+<p><strong>同步任务</strong>：在主线程上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务；</p>
+<p><strong>异步任务</strong>：不进入主线程、而进入”任务队列”（task queue）的任务，只有”任务队列”通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。</p>
+<p><img src="/EventLoop/Untitled_1.png" alt="任务类型图"></p>
+<img src="/2023/02/16/EventLoop/Untitled_1.png" class="" title="任务类型图">
+
+<p>（1）所有<strong>同步任务</strong>都在主线程上执行，形成一个<a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2013/11/stack.html"><strong>执行栈</strong></a>（execution context stack）。</p>
+<p>（2）主线程之外，还存在一个”任务队列”（task queue）。只要异步任务有了运行结果，就在”任务队列”之中放置一个事件。</p>
+<p>（3）一旦”执行栈”中的所有同步任务执行完毕，系统就会读取”任务队列”，看看里面有哪些事件。那些对应的异步任务，于是结束等待状态，进入执行栈，开始执行。</p>
+<p>（4）主线程不断重复上面的第三步。</p>
+<p>Note：图中所列出的任务队列均为macrotask queue，而ES6 的 promise［ECMAScript标准］产生的任务队列为microtask queue。</p>
+<h2 id="任务队列-Task-queues"><a href="#任务队列-Task-queues" class="headerlink" title="任务队列 Task queues"></a>任务队列 Task queues</h2><p>异步任务队列存在两种类型，一种为microtask queue，另一种为macrotask queue。</p>
+<h1 id="深挖EventLoop规范"><a href="#深挖EventLoop规范" class="headerlink" title="深挖EventLoop规范"></a>深挖EventLoop规范</h1><p>事件循环。HTML5标准：task(macrotask)、microtask和UI render的具体执行过程如下：</p>
+<p><a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model">HTML</a></p>
+<blockquote>
+<p>An event loop must continually run through the following steps for as long as it exists:<br>1.Select the <strong>oldest task</strong> on one of the event loop’s task queues, if any, ignoring, in the case of a browsing context event loop, tasks whose associated Documents are not fully active. The user agent may pick any task queue. If there is no task to select, then jump to the microtasks step below.<br>2.Set the event loop’s currently running task to the task selected in the previous step.<br>3.Run: Run the selected task.<br>4.Set the event loop’s currently running task back to null.<br>5.Remove the task that was run in the run step above from its task queue.<br>6.<strong>Microtasks</strong>: Perform a microtask checkpoint. //这里会执行所有的microtask<br>7.<strong>Update the rendering</strong>: If this event loop is a browsing context event loop (as opposed to a worker event loop), then run the following substeps.<br>    7.1 Let now be the value that would be returned by the Performance object’s now() method.<br>    7.2 Let docs be the list of Document objects associated with the event loop in question, sorted arbitrarily except that the following conditions must be met:<br>    7.3 If there are top-level browsing contexts B that the user agent believes would not benefit from having their rendering updated at this time, then remove from docs all Document objects whose browsing context’s top-level browsing context is in B.<br>    7.4 If there are a nested browsing contexts B that the user agent believes would not benefit from having their rendering updated at this time, then remove from docs all Document objects whose browsing context is in B.<br>    7.5 For each fully active Document in docs, run the resize steps for that Document, passing in now as the timestamp. [CSSOMVIEW]<br>   7.6 For each fully active Document in docs, run the scroll steps for that Document, passing in now as the timestamp. [CSSOMVIEW]<br>   7.7 For each fully active Document in docs, evaluate media queries and report changes for that Document, passing in now as the timestamp. [CSSOMVIEW]<br>   7.8 For each fully active Document in docs, run CSS animations and send events for that Document, passing in now as the timestamp. [CSSANIMATIONS]<br>   7.9 For each fully active Document in docs, run the fullscreen rendering steps for that Document, passing in now as the timestamp. [FULLSCREEN]<br>   7.10 For each fully active Document in docs, <strong>run the animation frame callbacks</strong> for that Document, passing in now as the timestamp.<br>   7.11 For each fully active Document in docs, run the update intersection observations steps for that Document, passing in now as the timestamp. [INTERSECTIONOBSERVER]<br>   7.12 For each fully active Document in docs, update the rendering or user interface of that Document and its browsing context to reflect the current state.<br>8.If this is a worker event loop (i.e. one running for a WorkerGlobalScope), but there are no tasks in the event loop’s <strong>task queues</strong> and the WorkerGlobalScope object’s closing flag is true, then destroy the event loop, aborting these steps, resuming the run a worker steps described in the Web workers section below.<br>9.Return to the first step of the event loop.</p>
+</blockquote>
+<h2 id="解释说明："><a href="#解释说明：" class="headerlink" title="解释说明："></a>解释说明：</h2><p>1-5. 从 task 队列（一个或多个）中选出最老的一个 task，执行它。</p>
+<ol start="6">
+<li><p>执行 microtask 检查点。简单说，会执行 microtask 队列中的所有 microtask，直到队列为空。如果 microtask 中又添加了新的 microtask，直接放进本队列末尾。</p>
+</li>
+<li><p>执行 UI render 操作：</p>
+</li>
+</ol>
+<p>7.1-7.4. 判断 document 在此时间点渲染是否会『获益』。浏览器只需保证 60Hz 的刷新率即可（在机器负荷重时还会降低刷新率），若 eventloop 频率过高，即使渲染了浏览器也无法及时展示。所以</p>
+<p><strong>并不是每轮 eventloop 都会执行 UI Render</strong>。</p>
+<p>7.5-7.9. 执行各种渲染所需工作，如 触发 resize、scroll 事件、建立媒体查询、运行 CSS 动画等等</p>
+<p><strong>7.10. 执行 animation frame callbacks</strong></p>
+<p>7.11. 执行 IntersectionObserver callback</p>
+<p>7.12. 渲染 UI</p>
+<h2 id="事件循环机制图"><a href="#事件循环机制图" class="headerlink" title="事件循环机制图"></a>事件循环机制图</h2><p><img src="/EventLoop/Untitled_2.png" alt="事件循环机制图"></p>
+<img src="/2023/02/16/EventLoop/Untitled_2.png" class="" title="事件循环机制图">
+
+<p>概括：每个 eventloop 由三个阶段构成：执行一个 task，执行 microtask 队列，可选的 ui render 阶段(包括rAf)</p>
+<h2 id="宏任务队列"><a href="#宏任务队列" class="headerlink" title="宏任务队列"></a>宏任务队列</h2><p><a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#task-queue">HTML规范是这样定义的</a>：</p>
+<p><a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#task-queue">HTML</a></p>
+<blockquote>
+<p><strong>Task queues are sets, not queues, because step one of the event loop processing model grabs the first runnable task from the chosen queue, instead of dequeuing the first task.</strong><br>      Note：The microtask queue is not a task queue.<br>      Note：Tasks encapsulate algorithms that are responsible for such work as:<br><strong>Events</strong><br>       Dispatching an Event object at a particular EventTarget object is often done by a dedicated task.<br>       Note：Not all events are dispatched using the task queue; many are dispatched during other tasks.<br><strong>Parsing</strong><br>       The HTML parser tokenizing one or more bytes, and then processing any resulting tokens, is typically a task.<br><strong>Callbacks</strong><br>       Calling a callback is often done by a dedicated task.<br><strong>Using a resource</strong><br>       When an algorithm fetches a resource, if the fetching occurs in a non-blocking fashion then the processing of the resource once some or all of the resource is available is performed by a task.<br><strong>Reacting to DOM manipulation</strong><br>       Some elements have tasks that trigger in response to DOM manipulation, e.g. when that element is inserted into the document.</p>
+</blockquote>
+<p>一个 eventloop 有一或多个 task 队列。每个 task 由一个确定的 task 源提供。从不同 task 源而来的 task 可能会放到不同的 task 队列中。例如，浏览器可能单独为鼠标键盘事件维护一个 task 队列，所有其他 task 都放到另一个 task 队列。通过区分 task 队列的优先级，使高优先级的 task 优先执行，保证更好的交互体验。</p>
+<p>Note：上述 <strong>Reacting to DOM manipulation （todo：待研究，下一个课题）</strong> 并不是说你执行DOM操作时就会把这个DOM操作的执行当成一个task。是那些异步的reacting会被当做task。</p>
+<h2 id="宏任务-Task-macrotask"><a href="#宏任务-Task-macrotask" class="headerlink" title="宏任务 Task(macrotask)"></a>宏任务 Task(macrotask)</h2><p>Task也叫macrotask，中文翻译过来就是宏任务。<a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources">HTML规范是这样定义的</a>：</p>
+<p><a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#generic-task-sources">HTML</a></p>
+<blockquote>
+<p><strong>8.1.6.4 Generic task sources</strong><br>The following task sources are used by a number of mostly unrelated features in this and other specifications.<br><strong>The DOM manipulation task source</strong><br>     This task source is used for features that react to DOM manipulations, such as things that    happen in a non-blocking fashion when an element is inserted into the document.<br><strong>The user interaction task source</strong><br>     This task source is used for features that react to user interaction, for example keyboard or mouse input.<br>      Events sent in response to user input (e.g. click events) must be fired using tasks queued with the user interaction task source. [UIEVENTS]<br><strong>The networking task source</strong><br>     This task source is used for features that trigger in response to network activity.<br><strong>The history traversal task source</strong><br>     This task source is used to queue calls to history.back() and similar APIs.</p>
+</blockquote>
+<p>也就是说Task包括：</p>
+<ul>
+<li>DOM 操作任务源：如元素以非阻塞方式插入文档</li>
+<li>用户交互任务源：如鼠标键盘事件。用户输入事件（如 click） 必须使用 task 队列</li>
+<li>网络任务源：如 XHR 回调</li>
+<li>history 回溯任务源：使用 history.back() 或者类似 API</li>
+</ul>
+<p>此外，还包括setTimeout, setInterval, window.postMessage等等。</p>
+<h2 id="微任务-microtask"><a href="#微任务-microtask" class="headerlink" title="微任务 microtask"></a>微任务 microtask</h2><p>微任务。HTML规范是这样定义的：</p>
+<p><a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/webappapis.html#microtask">HTML</a></p>
+<p>microtask包括：</p>
+<ul>
+<li>Promise.then<blockquote>
+<p>Promise 规范中提及 Promise.then 的具体实现由平台把握，可以是 microtask 或 task。当前的共识是使用 microtask 实现。</p>
+</blockquote>
+</li>
+<li>MutationObserver</li>
+<li>Object.observe</li>
+</ul>
+<h2 id="microtask-amp-macrotask-区别"><a href="#microtask-amp-macrotask-区别" class="headerlink" title="microtask &amp; macrotask 区别"></a>microtask &amp; macrotask 区别</h2><p>microtask queue：唯一，整个事件循环当中，仅存在一个；执行为同步，同一个事件循环中的microtask会按队列顺序，串行执行完毕；</p>
+<p>macrotask queue：不唯一，存在一定的优先级（用户I/O部分优先级更高）；异步执行，同一事件循环中，只执行一个。</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//步骤1： 开始执行首个 eventloop 的 task 阶段</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;A&#x27;</span>) <span class="comment">// 步骤2：**输出 A**</span></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;  <span class="comment">// 步骤3：立刻将 callback（B） 放入 task 队列中</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;B&#x27;</span>)</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;  <span class="comment">// 步骤4：立刻将 callback（C） 放入 microtask 队列中</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;C&#x27;</span>)</span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;D&#x27;</span>)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;E&#x27;</span>) <span class="comment">// 步骤5：**输出 E**</span></span><br><span class="line"><span class="comment">// 步骤6：首个 eventloop 的 task 阶段执行完毕，开始执行 microtask，发现有一个 callback（C），执行之，**输出 C**，同时又将 callback（D）放入 microtask 队列中</span></span><br><span class="line"><span class="comment">// 步骤7：发现 microtask 队列不为空，执行 callback（D），**输出 D**</span></span><br><span class="line"><span class="comment">// 步骤8：microtask 队列为空，执行 UI render，（根据机器负荷等环境影响，综合浏览器策略，此步骤可能执行也可能不执行）</span></span><br><span class="line"><span class="comment">// 步骤9：首次 eventloop 结束。执行第二轮 eventloop，取出一个 task callback（B），执行之，**输出 B**</span></span><br></pre></td></tr></table></figure>
+
+<p>结果是：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A</span><br><span class="line">E</span><br><span class="line">C</span><br><span class="line">D</span><br><span class="line">B</span><br></pre></td></tr></table></figure>
+
+<h2 id="关于requestAnimationFrame"><a href="#关于requestAnimationFrame" class="headerlink" title="关于requestAnimationFrame"></a>关于requestAnimationFrame</h2><p>从上面资料可以得出一个结论：任务类型可分为两种microtask和macrotask，既然rAF不属于microtask那么按照规则它应该被划分到macrotask里面，但是事情真的这么简单么？</p>
+<p>请预测一下下面例子的结果：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;A&#x27;</span>)</span><br><span class="line">&#125;, <span class="number">0</span>)</span><br><span class="line"><span class="title function_">requestAnimationFrame</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;B&#x27;</span>)</span><br><span class="line">  <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;C&#x27;</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>结果是：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">B</span><br><span class="line">C</span><br><span class="line">A</span><br><span class="line"><span class="comment">// 有可能出现 A B C 的情况，本节讨论的重点在于 B C 一定紧挨着输出</span></span><br></pre></td></tr></table></figure>
+
+<p>使用 devtool 查看运行情况：(本图引自资料3)</p>
+<p><img src="/EventLoop/Untitled_3.png" alt="devtool 查看运行情况截图"></p>
+<img src="/2023/02/16/EventLoop/Untitled_3.png" class="" title="devtool 查看运行情况截图">
+
+<p>可以看到 requestAnimationFrame 中注册的 microtask 并没有在下一轮 eventloop 的 task 之后执行，而是直接在本轮 eventloop 中紧跟着 requestAnimationFrame 执行了。起初我认为规范明摆着表明 eventloop 由执行 task、执行 microtask、UI render 三部分构成，从属于 render 阶段的 requestAnimationFrame 说是 task 怎么不大合适。</p>
+<p>深入 requestAnimationFrame 的执行过程也能发现：<a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/imagebitmap-and-animations.html#animation-frames">在执行 animation frame callbacks 时，会唤起 callback（invoke the callback）</a>，<a target="_blank" rel="noopener" href="https://heycam.github.io/webidl/#invoke-a-callback-function">在唤起 callback 的最后一步，会 clean up after running a callback</a>，此时若满足 javascript 执行栈为空的条件，则执行 microtask。</p>
+<p>也就是说一轮 eventloop 中有可能执行多次 microtask。</p>
+<h2 id="requestAnimationFrame执行时机"><a href="#requestAnimationFrame执行时机" class="headerlink" title="requestAnimationFrame执行时机"></a>requestAnimationFrame执行时机</h2><p>执行 requestAnimationFrame callback 是 UI Render 的其中一步。上文已经提到过并不是每轮 eventloop 都会执行 UI Render。我们仔细看文档：</p>
+<blockquote>
+<p>For example, if the browser is attempting to achieve a 60Hz refresh rate, then these steps are only necessary every 60th of a second (about 16.7ms). If the browser finds that a top-level browsing context is not able to sustain this rate, it might drop to a more sustainable 30Hz for that set of Documents, rather than occasionally dropping frames. (This specification does not mandate any particular model for when to update the rendering.) Similarly, if a top-level browsing context is in the background, the user agent might decide to drop that page to a much slower 4Hz, or even less.</p>
+</blockquote>
+<p>如果浏览器试图实现 60Hz 的刷新率，那么 UI Render 只需要每秒执行 60 次（每 16.7 ms）。如果浏览器发现『顶层浏览器上下文』无法维持住这个频率，可能会下调到可维持的 30Hz，而不是掉帧。（本规范并不对何时进行 render 做任何规定。）类似的，如果一个顶层浏览器上下文在后台运行，用户代理可能决定将该页面的刷新率降到 4Hz，甚至更低。</p>
+<p>由于规范没有做约定，所以浏览器在 render 策略上有充分的自主性。既有可能出现每一轮 eventloop 后都 render 的现象，也有可能出现几十轮 eventloop 都不 render 的情况。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>每个 eventloop 由三个阶段构成：执行一个 task，执行 microtask 队列，可选的 <strong>ui render</strong> 阶段，<strong>requestAnimationFrame callback 在 ui render 阶段执行</strong>。我们平时写的逻辑代码会被分类为不同的 task 和 microtask。</li>
+<li>microtask 中注册的 microtask 事件会直接加入到当前 microtask 队列。</li>
+<li>microtask 执行时机『尽可能早』，只要 javascript 执行栈为空，就会执行。一轮 eventloop 中，可能执行多次 microtask。</li>
+<li>requestAnimationFrame callback 的执行时机与浏览器的 render 策略有关，是黑箱的。</li>
+</ol>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2014/10/event-loop.html">JavaScript 运行机制详解：再谈Event Loop</a> (Node.js中的EventLoop)</li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hity-tt/p/6733062.html">JS 事件循环机制 - 任务队列、web API、JS主线程的相互协同</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.404forest.com/2017/07/18/how-javascript-actually-works-eventloop-and-uirendering/#7-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99">深入探究 eventloop 与浏览器渲染的时序问题</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Ma63d/vue-analysis/issues/6">Vue源码详解之nextTick：MutationObserver只是浮云，microtask才是核心！</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/aooy/blog/issues/5">从event loop规范探究javaScript异步及浏览器更新渲染时机</a> (未读)</li>
+<li><a target="_blank" rel="noopener" href="https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/">Tasks, microtasks, queues and schedules</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/25407758">Excuse me？这个前端面试在搞事！</a></li>
+<li><a target="_blank" rel="noopener" href="http://whatwg.org/">whatwg.org</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/02/16/EventLoop/" data-id="cle6wjljh0000usxz1g8b2lbm" data-title="EventLoop" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/02/16/hello-world/" class="article-date">
+  <time class="dt-published" datetime="2023-02-16T07:45:57.873Z" itemprop="datePublished">2023-02-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/02/16/hello-world/">Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/02/16/hello-world/" data-id="cle6wjljp0001usxz3kaz8s45" data-title="Hello World" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">February 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/02/16/EventLoop/">EventLoop</a>
+          </li>
+        
+          <li>
+            <a href="/2023/02/16/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
